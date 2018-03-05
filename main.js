@@ -15,7 +15,14 @@
     this.gameDeck = new Deck(this.deck_div, option);
     this.gameDeck.buildDeck();
 
-    // Discard Pile
+    var shuffleBtn = document.createElement("button");
+    shuffleBtn.innerHTML = "Shuffle";
+    shuffleBtn.onclick = this.gameDeck.shuffle.bind(this);
+
+
+    this.info_div.appendChild(shuffleBtn);
+
+
     // Rules
     this.el.appendChild(this.info_div);
     this.el.appendChild(this.deck_div);
@@ -37,52 +44,69 @@
 
       deck_div.appendChild(parentFrag);
     }
+  }
 
+  // Cards
+  Deck.prototype.shuffle = function () {
+    var cardsToShuffle = this.gameDeck.deckData;
+    var m = cardsToShuffle.length, t, i;
+    while (m) {
+      i = Math.floor(Math.random() * m--);
+      t = cardsToShuffle[m];
+      cardsToShuffle[m] = cardsToShuffle[i];
+      cardsToShuffle[i] = t;
+    }
+    this.gameDeck.deckData = cardsToShuffle;
+    this.gameDeck.buildDeck(this.deck_div);
+  }
 
-    var Card = function () {
-      this.id = "";
-      this.data = "";
-      this.cardCont = document.createElement("div");
-      this.cardCont.className = "card_container";
-      this.cardFront = document.createElement("div");
-      this.cardFront.className = "card_front";
-      this.cardBack = document.createElement("div");
-      this.cardBack.className = "card_back";
-      this.buildCard = function (parentFrag) {
-        var flipDiv = document.createElement("div"),
-          frontValDiv = document.createElement("div"),
-          backValDiv = document.createElement("div"),
-          catDiv = document.createElement("div");
-        flipDiv.className = "flip";
-        frontValDiv.className = "front_val";
-        backValDiv.className = "back_val";
-        catDiv.className = "cat_val";
+  // Card
+  var Card = function () {
+    this.id = "";
+    this.data = "";
+    this.cardCont = document.createElement("div");
+    this.cardCont.className = "card_container";
+    this.cardFront = document.createElement("div");
+    this.cardFront.className = "card_front";
+    this.cardBack = document.createElement("div");
+    this.cardBack.className = "card_back";
+    this.buildCard = function (parentFrag) {
+      var flipDiv = document.createElement("div"),
+        frontValDiv = document.createElement("div"),
+        backValDiv = document.createElement("div"),
+        catDiv = document.createElement("div");
+      flipDiv.className = "flip";
+      frontValDiv.className = "front_val";
+      backValDiv.className = "back_val";
+      catDiv.className = "cat_val";
 
-        frontValDiv.innerHTML = this.data.q;
-        backValDiv.innerHTML = this.data.a;
-        catDiv.innerHTML = this.data.category;
+      frontValDiv.innerHTML = this.data.q;
+      backValDiv.innerHTML = this.data.a;
+      catDiv.innerHTML = this.data.category;
 
-        this.cardFront.appendChild(frontValDiv);
-        this.cardFront.appendChild(catDiv);
-        this.cardBack.appendChild(backValDiv);
+      this.cardFront.appendChild(frontValDiv);
+      this.cardFront.appendChild(catDiv);
+      this.cardBack.appendChild(backValDiv);
 
-        flipDiv.appendChild(this.cardFront);
-        flipDiv.appendChild(this.cardBack);
+      flipDiv.appendChild(this.cardFront);
+      flipDiv.appendChild(this.cardBack);
 
-        this.cardCont.id = this.id;
-        this.cardCont.appendChild(flipDiv);
-        parentFrag.appendChild(this.cardCont);
+      this.cardCont.id = this.id;
+      this.cardCont.appendChild(flipDiv);
+      this.cardCont.onclick = function (e) {
+        e.currentTarget.classList.toggle("flip_card");
+        e.currentTarget.classList.toggle("slide_over");
 
       }
-
-    }
-
-    var DiscardPile = function () {
+      parentFrag.appendChild(this.cardCont);
 
     }
   }
 
+  // Discard Pile
+  var DiscardPile = function () {
 
+  }
 
   window.Game = Game;
 
