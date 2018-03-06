@@ -12,8 +12,8 @@
 
     this.deck_div = document.createElement("div");
     this.deck_div.id = "deck_div";
-    this.gameDeck = new Deck(this.deck_div, option);
-    this.gameDeck.buildDeck();
+    this.gameDeck = new Deck(option);
+    this.gameDeck.buildDeck.call(this);
 
     var shuffleBtn = document.createElement("button");
     shuffleBtn.innerHTML = "Shuffle";
@@ -30,19 +30,19 @@
   }
 
   // Deck
-  var Deck = function (deck_div, option) {
+  var Deck = function (option) {
     this.deckData = option.data;
     this.buildDeck = function () {
       var parentFrag = document.createDocumentFragment();
-      deck_div.innerHTML = "";
-      for (var i = this.deckData.length - 1; i >= 0; i--) {
+      this.deck_div.innerHTML = "";
+      for (var i = this.option.data.length - 1; i >= 0; i--) {
         var card = new Card();
         card.id = "card-" + i;
-        card.data = this.deckData[i];
+        card.data = this.option.data[i];
         card.buildCard(parentFrag);
       }
-
-      deck_div.appendChild(parentFrag);
+      this.deck_div.appendChild(parentFrag);
+      this.gameDeck.stack.call(this);
     }
   }
 
@@ -57,7 +57,18 @@
       cardsToShuffle[i] = t;
     }
     this.gameDeck.deckData = cardsToShuffle;
-    this.gameDeck.buildDeck(this.deck_div);
+    this.gameDeck.buildDeck.call(this);
+  }
+
+  // Stack
+  Deck.prototype.stack = function () {
+    var cards = this.deck_div.children;
+    for (var i = cards.length - 1; i >= 0; i--) {
+      cards[i].style.top = i + "px"
+      cards[i].style.left = i + "px";
+      cards[i].classList.add("stacked_card");
+    }
+
   }
 
   // Card
@@ -93,15 +104,24 @@
 
       this.cardCont.id = this.id;
       this.cardCont.appendChild(flipDiv);
-      this.cardCont.onclick = function (e) {
-        e.currentTarget.classList.toggle("flip_card");
-        e.currentTarget.classList.toggle("slide_over");
 
-      }
+      // Flip
+      this.cardCont.onclick = cardClick;
       parentFrag.appendChild(this.cardCont);
 
     }
   }
+
+  var cardClick = (function (e) {
+    var counter = 0;
+    return function (e) {
+      e.currentTarget.classList.toggle("flip_card");
+      e.currentTarget.classList.toggle("slide_over");
+      e.currentTarget.style.zIndex = counter;
+      counter++;
+    }
+  })()
+
 
   // Discard Pile
   var DiscardPile = function () {
